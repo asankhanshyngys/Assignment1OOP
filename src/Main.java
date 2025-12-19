@@ -5,13 +5,14 @@ class Main {
         MenuItem cola = new MenuItem("Cola", 600, "Drink");
         MenuItem fries = new MenuItem("Fries", 800, "Meal");
         MenuItem cake = new MenuItem("Chocolate Cake", 1500, "Dessert");
+        MenuItem stake = new MenuItem("Stake", 4000, "Meat");
 
         MenuItem[] menu = { burger, cola, fries, cake };
         Restaurant restaurant = new Restaurant("Shyngys Restaurant", menu);
 
         restaurant.printMenu();
 
-        MenuItem[] orderItems = { burger, fries, cola };
+        MenuItem[] orderItems = { burger, fries, stake };
         Order order1 = new Order(101, orderItems);
 
         System.out.println("\n=== ORDER DETAILS ===");
