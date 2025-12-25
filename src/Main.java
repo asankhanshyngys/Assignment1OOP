@@ -7,7 +7,7 @@ class Main {
         MenuItem cake = new MenuItem("Chocolate Cake", 1500, "Dessert");
         MenuItem stake = new MenuItem("Stake", 4000, "Meat");
 
-        MenuItem[] menu = { burger, cola, fries, cake };
+        MenuItem[] menu = { burger, cola, fries, cake ,stake};
         Restaurant restaurant = new Restaurant("Shyngys Restaurant", menu);
 
         restaurant.printMenu();
