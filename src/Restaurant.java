@@ -1,3 +1,4 @@
+import java.util.Arrays;
 public class Restaurant {
 
     private String name;
@@ -34,6 +35,27 @@ public class Restaurant {
         for (MenuItem item : menu) {
             item.printInfo();
         }
+    }
+    public void filterByCategory(String category){
+        System.out.println("\nFiltered by: " + category);
+        for(MenuItem item : menu){
+            if(item.getCategory().equalsIgnoreCase(category))
+                item.printInfo();
+        }
+    }
+    public void sortByPrice(){
+        Arrays.sort(menu, (a,b) -> Double.compare(a.getPrice(),b.getPrice()));
+        System.out.println("\nMenu sorted by price (cheapest first:)");
+        printMenu();
+    }
+
+    public MenuItem searchByName(String name){
+        for(MenuItem item : menu){
+            if (item.getName().equalsIgnoreCase(name)){
+                return item;
+            }
+        }
+        return null;
     }
 }
 

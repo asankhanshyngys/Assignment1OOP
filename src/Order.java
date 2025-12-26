@@ -27,4 +27,8 @@ public class Order {
         }
         System.out.println("Total: " + calculateTotal() + "₸");
     }
+    @Override
+    public String toString(){
+        return "Order #" + orderId;
+    }
 }
