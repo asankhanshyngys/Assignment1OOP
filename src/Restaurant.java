@@ -57,6 +57,13 @@ public class Restaurant {
         }
         return null;
     }
+
+    public MenuItem searchByName(int index){
+        if(index >= 0 && index < menu.length){
+            return menu[index];
+        }
+        return null;
+    }
 }
 
 
