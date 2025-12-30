@@ -24,12 +24,19 @@ public class Main {
         System.out.println("Type '0' to finish.\n");
 
         while(true){
-            System.out.print("Enter item name: ");
+            System.out.print("Enter item name or index: ");
             String input = s.nextLine();
-            if(input.equalsIgnoreCase("0")){
+            if(input.equalsIgnoreCase("-1")){
                 break;
             }
             MenuItem found = restaurant.searchByName(input);
+            if(input.matches("\\d+")){
+                int index = Integer.parseInt(input);
+                found = restaurant.searchByName(index);
+            }
+            else{
+                found = restaurant.searchByName(input);
+            }
             if (found != null){
                 cart.add(found);
                 System.out.println(found.getName() + " added to your order!");
