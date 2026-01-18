@@ -1,60 +1,166 @@
-import java.util.Arrays;
-import java.util.Scanner;
+
+import dao.MenuItemDao;
+import dao.RestaurantDao;
+import model.*;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
 
-        MenuItem burger = new FoodItem("Burger", 2500);
-        MenuItem cola = new DrinkItem("Cola", 600);
-        MenuItem fries = new FoodItem("Fries", 800);
-        MenuItem cake = new FoodItem("Chocolate Cake", 1500);
-        MenuItem stake = new FoodItem("Stake", 4000);
-        MenuItem coffee = new DrinkItem("Coffee", 400);
+        Scanner sc = new Scanner(System.in);
 
-        MenuItem[] menu = { burger, cola, fries, cake ,stake,coffee};
-        Restaurant restaurant = new Restaurant("Shyngys Restaurant", menu);
+        RestaurantDao restaurantDao = new RestaurantDao();
+        MenuItemDao menuItemDao = new MenuItemDao();
 
-        restaurant.printMenu();
+        try {
+            // 1️⃣ Create or load restaurant
+            String restaurantName = "Shyngys Restaurant";
+            Integer restaurantId = restaurantDao.findRestaurantIdByName(restaurantName);
 
-        Scanner s = new Scanner(System.in);
-        ArrayList<MenuItem> cart = new ArrayList<>();
+            if (restaurantId == null) {
+                restaurantId = restaurantDao.createRestaurant(restaurantName);
+                System.out.println("Restaurant created in DB.");
+            }
 
-        System.out.println("\nType the item name to add to your order.");
-        System.out.println("Type '0' to finish.\n");
+            // 2️⃣ Load menu from DB
+            List<MenuItem> menuFromDb = menuItemDao.findMenuByRestaurant(restaurantId);
 
-        while(true){
-            System.out.print("Enter item name or index: ");
-            String input = s.nextLine();
-            if(input.equalsIgnoreCase("-1")){
-                break;
+            // 3️⃣ If DB is empty → insert default items once
+            if (menuFromDb.isEmpty()) {
+                System.out.println("Menu empty. Inserting default items...");
+
+                menuItemDao.createMenuItem(new FoodItem("Burger", 2500));
+                menuItemDao.createMenuItem(new DrinkItem("Cola", 600));
+                menuItemDao.createMenuItem(new FoodItem("Fries", 800));
+                menuItemDao.createMenuItem(new FoodItem("Chocolate Cake", 1500));
+                menuItemDao.createMenuItem(new FoodItem("Stake", 4000));
+                menuItemDao.createMenuItem(new DrinkItem("Coffee", 400));
+
+                // reload menu
+                menuFromDb = menuItemDao.findMenuByRestaurant(restaurantId);
             }
-            MenuItem found = restaurant.searchByName(input);
-            if(input.matches("\\d+")){
-                int index = Integer.parseInt(input);
-                found = restaurant.searchByName(index);
+
+            // assign restaurantId to items
+            for (MenuItem item : menuFromDb) {
+                item.setRestaurantId(restaurantId);
             }
-            else{
-                found = restaurant.searchByName(input);
+
+            Restaurant restaurant = new Restaurant(restaurantId, restaurantName, menuFromDb);
+
+            // 4️⃣ CRUD + ORDER menu
+            while (true) {
+                System.out.println("\n=== MAIN MENU ===");
+                System.out.println("1. Show menu");
+                System.out.println("2. Add menu item");
+                System.out.println("3. Update item price");
+                System.out.println("4. Delete item");
+                System.out.println("5. Make order");
+                System.out.println("0. Exit");
+
+                System.out.print("Choose option: ");
+                String choice = sc.nextLine();
+
+                switch (choice) {
+
+                    case "1":
+                        restaurant.printMenu();
+                        break;
+
+                    case "2": {
+                        System.out.print("Item name: ");
+                        String name = sc.nextLine();
+                        System.out.print("Price: ");
+                        double price = Double.parseDouble(sc.nextLine());
+                        System.out.print("Category (Food/Drink): ");
+                        String category = sc.nextLine();
+
+                        MenuItem item = category.equalsIgnoreCase("Drink")
+                                ? new DrinkItem(name, price)
+                                : new FoodItem(name, price);
+
+                        item.setRestaurantId(restaurantId);
+                        int id = menuItemDao.createMenuItem(item);
+                        item.setID(id);
+                        restaurant.getMenu().add(item);
+
+                        System.out.println("Item added.");
+                        break;
+                    }
+
+                    case "3": {
+                        restaurant.printMenu();
+                        System.out.print("Item index: ");
+                        int idx = Integer.parseInt(sc.nextLine());
+
+                        MenuItem item = restaurant.searchByName(idx); // ✅ overload used
+                        if (item != null) {
+                            System.out.print("New price: ");
+                            double newPrice = Double.parseDouble(sc.nextLine());
+                            menuItemDao.updatePrice(item.getId(), newPrice);
+                            item.setPrice(newPrice);
+                            System.out.println("Price updated.");
+                        }
+                        break;
+                    }
+
+                    case "4": {
+                        restaurant.printMenu();
+                        System.out.print("Item index to delete: ");
+                        int idx = Integer.parseInt(sc.nextLine());
+
+                        MenuItem item = restaurant.searchByName(idx);
+                        if (item != null) {
+                            menuItemDao.deleteItem(item.getId());
+                            restaurant.getMenu().remove(item);
+                            System.out.println("Item deleted.");
+                        }
+                        break;
+                    }
+
+                    case "5": {
+                        ArrayList<MenuItem> cart = new ArrayList<>();
+
+                        restaurant.printMenu();
+                        System.out.println("Enter item name or index (0 to finish):");
+
+                        while (true) {
+                            String input = sc.nextLine();
+                            if (input.equals("0")) break;
+
+                            MenuItem found = input.matches("\\d+")
+                                    ? restaurant.searchByName(Integer.parseInt(input))
+                                    : restaurant.searchByName(input);
+
+                            if (found != null) {
+                                cart.add(found);
+                                System.out.println(found.getName() + " added.");
+                            } else {
+                                System.out.println("Item not found.");
+                            }
+                        }
+
+                        if (!cart.isEmpty()) {
+                            Order order = new Order(1, cart.toArray(new MenuItem[0]));
+                            order.printOrder();
+                        }
+                        break;
+                    }
+
+                    case "0":
+                        System.out.println("Goodbye!");
+                        sc.close();
+                        return;
+                }
             }
-            if (found != null){
-                cart.add(found);
-                System.out.println(found.getName() + " added to your order!");
-            }
-            else{
-                System.out.println("Item not found in menu. Try again.");
-            }
+
+        } catch (SQLException e) {
+            System.out.println("Database error:");
+            e.printStackTrace();
         }
-
-        if(cart.isEmpty()){
-            System.out.println("\nNo item selected.Order canceledl.");
-        }
-        else{
-            MenuItem[] orderArray = cart.toArray(new MenuItem[0]);
-            Order ord = new Order(1,orderArray);
-            System.out.println("\n === YOUR ORDER ===");
-            ord.printOrder();
-        }
-        s.close();
     }
 }

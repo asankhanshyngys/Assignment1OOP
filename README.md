@@ -1,4 +1,4 @@
-# Restaurant Ordering System (Java)
+# model.Restaurant Ordering System (Java)
 
 ## Project Description
 This project is a console-based Java application that simulates a simple restaurant ordering system.  
@@ -17,9 +17,9 @@ The project demonstrates core Object-Oriented Programming (OOP) concepts in Java
 ## Implemented Requirements
 - Classes and objects
 - Encapsulation (private fields with getters)
-- Inheritance (`FoodItem`, `DrinkItem`)
+- Inheritance (`model.FoodItem`, `model.DrinkItem`)
 - Polymorphism:
     - Method overriding (`printInfo()`)
     - Method overloading (`searchByName(String)` and `searchByName(int)`)
 - User input handling
-- Order total calculation
+- model.Order total calculation

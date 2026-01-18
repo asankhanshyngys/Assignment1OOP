@@ -1,34 +1,31 @@
+package model;
+import java.util.ArrayList;
 import java.util.Arrays;
-public class Restaurant {
+import java.util.Comparator;
+import java.util.List;
 
+public class Restaurant {
+    private int id;
     private String name;
-    private MenuItem[] menu;
+    private List<MenuItem> menu;
 
     public Restaurant() {
+        this.menu = new ArrayList<>();
     }
 
     public Restaurant(String name, MenuItem[] menu) {
         this.name = name;
-        this.menu = menu;
+        this.menu = new ArrayList<>(Arrays.asList(menu));
     }
 
-    public void setName(String name) {
+    public Restaurant(int id, String name, List<MenuItem> menu){
+        this.id = id;
         this.name = name;
-    }
-
-    public void setMenu(MenuItem[] menu) {
         this.menu = menu;
     }
 
-    public MenuItem findMostExpensive() {
-        MenuItem max = menu[0];
-        for (MenuItem item : menu) {
-            if (item.getPrice() > max.getPrice()) {
-                max = item;
-            }
-        }
-        return max;
-    }
+    public int getId(){ return  id; }
+    public String getName(){return name; }
 
     public void printMenu() {
         System.out.println("=== MENU of " + name + " ===");
@@ -44,7 +41,7 @@ public class Restaurant {
         }
     }
     public void sortByPrice(){
-        Arrays.sort(menu, (a,b) -> Double.compare(a.getPrice(),b.getPrice()));
+        menu.sort(Comparator.comparingDouble(MenuItem::getPrice));
         System.out.println("\nMenu sorted by price (cheapest first:)");
         printMenu();
     }
@@ -59,10 +56,13 @@ public class Restaurant {
     }
 
     public MenuItem searchByName(int index){
-        if(index >= 0 && index < menu.length){
-            return menu[index];
+        if(index >= 0 && index < menu.size()){
+            return menu.get(index);
         }
         return null;
+    }
+    public List<MenuItem> getMenu(){
+        return menu;
     }
 }
 

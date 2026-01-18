@@ -1,3 +1,5 @@
+package model;
+
 public class Order {
 
     private int orderId;
@@ -21,7 +23,7 @@ public class Order {
     }
 
     public void printOrder() {
-        System.out.println("Order #" + orderId + ":");
+        System.out.println("model.Order #" + orderId + ":");
         for (MenuItem item : items) {
             item.printInfo();
         }
@@ -29,6 +31,6 @@ public class Order {
     }
     @Override
     public String toString(){
-        return "Order #" + orderId;
+        return "model.Order #" + orderId;
     }
 }
