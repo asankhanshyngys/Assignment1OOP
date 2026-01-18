@@ -1,3 +1,5 @@
+package model;
+
 public class Order {
 
     private int orderId;
@@ -21,10 +23,14 @@ public class Order {
     }
 
     public void printOrder() {
-        System.out.println("Order #" + orderId + ":");
+        System.out.println("model.Order #" + orderId + ":");
         for (MenuItem item : items) {
             item.printInfo();
         }
         System.out.println("Total: " + calculateTotal() + "₸");
+    }
+    @Override
+    public String toString(){
+        return "model.Order #" + orderId;
     }
 }
