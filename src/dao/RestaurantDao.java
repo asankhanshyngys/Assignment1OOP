@@ -29,7 +29,7 @@ public class RestaurantDao {
         }
     }
     public void deleteRestaurant(int id) throws SQLException{
-        String sql = "DELETE FROM restaurant WHERE id=?";
+        String sql = "DELETE FROM restaurants WHERE id=?";
         try(Connection con = Db.getConnection();
             PreparedStatement ps = con.prepareStatement(sql)){
                 ps.setInt(1,id);
