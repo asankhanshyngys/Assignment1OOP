@@ -26,22 +26,6 @@ public class Main {
             }
             List<MenuItem> menuFromDb = menuItemDao.findMenuByRestaurant(restaurantId);
 
-            if (menuFromDb.isEmpty()) {
-                System.out.println("Menu empty. Inserting default items...");
-
-                menuItemDao.createMenuItem(new FoodItem("Burger", 2500));
-                menuItemDao.createMenuItem(new DrinkItem("Cola", 600));
-                menuItemDao.createMenuItem(new FoodItem("Fries", 800));
-                menuItemDao.createMenuItem(new FoodItem("Chocolate Cake", 1500));
-                menuItemDao.createMenuItem(new FoodItem("Stake", 4000));
-                menuItemDao.createMenuItem(new DrinkItem("Coffee", 400));
-
-                menuFromDb = menuItemDao.findMenuByRestaurant(restaurantId);
-            }
-            for (MenuItem item : menuFromDb) {
-                item.setRestaurantId(restaurantId);
-            }
-
             Restaurant restaurant = new Restaurant(restaurantId, restaurantName, menuFromDb);
             while (true) {
                 System.out.println("\n=== MAIN MENU ===");
@@ -116,11 +100,11 @@ public class Main {
                         ArrayList<MenuItem> cart = new ArrayList<>();
 
                         restaurant.printMenu();
-                        System.out.println("Enter item name or index (0 to finish):");
+                        System.out.println("Enter item name or index (-1 to finish):");
 
                         while (true) {
                             String input = sc.nextLine();
-                            if (input.equals("0")) break;
+                            if (input.equals("-1")) break;
 
                             MenuItem found = input.matches("\\d+")
                                     ? restaurant.searchByName(Integer.parseInt(input))
