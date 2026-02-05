@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Restaurant Manager</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<section style="max-width:1000px;margin:30px auto;padding:18px;background:#fff;border:1px solid #eee;border-radius:12px">
+    <h2 style="margin-top:0">Restaurant Manager</h2>
+
+    <div style="display:flex;gap:18px;flex-wrap:wrap">
+        <div style="flex:1;min-width:280px;border:1px solid #eee;border-radius:12px;padding:14px">
+            <h3>Restaurants</h3>
+
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+                <input id="restName" placeholder="New restaurant name" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px">
+                <button id="addRestBtn" style="padding:10px 14px;border-radius:10px;border:0;cursor:pointer">Add</button>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+                <button id="reloadRestsBtn" style="padding:10px 14px;border-radius:10px;border:0;cursor:pointer">Refresh</button>
+                <select id="restSelect" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px"></select>
+            </div>
+
+            <button id="openRestaurantBtn" style="width:100%;padding:10px 14px;border-radius:10px;border:0;cursor:pointer">
+                Open selected restaurant
+            </button>
+        </div>
+
+        <div style="flex:2;min-width:380px;border:1px solid #eee;border-radius:12px;padding:14px">
+            <h3 style="margin-top:0">Workspace</h3>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+                <button class="tabBtn" data-tab="menu" style="padding:10px 14px;border-radius:10px;border:0;cursor:pointer">Menu</button>
+                <button class="tabBtn" data-tab="order" style="padding:10px 14px;border-radius:10px;border:0;cursor:pointer">Make Order</button>
+                <button class="tabBtn" data-tab="orders" style="padding:10px 14px;border-radius:10px;border:0;cursor:pointer">Orders</button>
+            </div>
+
+            <div id="tab-menu" class="tab">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+                    <input id="menuSearch" placeholder="Search item..." style="flex:1;min-width:180px;padding:10px;border:1px solid #ddd;border-radius:10px">
+                    <select id="menuSort" style="padding:10px;border:1px solid #ddd;border-radius:10px">
+                        <option value="name">Sort: name</option>
+                        <option value="price">Sort: price</option>
+                    </select>
+                    <button id="reloadMenuBtn" style="padding:10px 14px;border-radius:10px;border:0;cursor:pointer">Reload menu</button>
+                </div>
+
+                <div style="border:1px solid #eee;border-radius:12px;padding:12px;margin-bottom:12px">
+                    <h4 style="margin-top:0">Add menu item</h4>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <input id="itemName" placeholder="Item name" style="flex:1;min-width:160px;padding:10px;border:1px solid #ddd;border-radius:10px">
+                        <input id="itemPrice" type="number" step="0.01" placeholder="Price" style="width:130px;padding:10px;border:1px solid #ddd;border-radius:10px">
+                        <select id="itemCategory" style="padding:10px;border:1px solid #ddd;border-radius:10px">
+                            <option value="food">food</option>
+                            <option value="drink">drink</option>
+                        </select>
+                        <button id="addItemBtn" style="padding:10px 14px;border-radius:10px;border:0;cursor:pointer">Add</button>
+                    </div>
+                </div>
+
+                <div id="menuList"></div>
+            </div>
+
+
+            <div id="tab-order" class="tab" style="display:none">
+                <p>Select items and create an order.</p>
+                <div id="orderPickList"></div>
+                <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap">
+                    <strong>Total: </strong><span id="orderTotal">0</span>
+                    <button id="createOrderBtn" style="padding:10px 14px;border-radius:10px;border:0;cursor:pointer">Create order</button>
+                </div>
+            </div>
+
+
+            <div id="tab-orders" class="tab" style="display:none">
+                <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+                    <button id="reloadOrdersBtn" style="padding:10px 14px;border-radius:10px;border:0;cursor:pointer">Reload orders</button>
+                </div>
+                <div id="ordersList"></div>
+            </div>
+
+            <pre id="msg" style="white-space:pre-wrap;"></pre>
+        </div>
+    </div>
+</section>
+<script src="app.js"></script>
+</body>
+</html>
