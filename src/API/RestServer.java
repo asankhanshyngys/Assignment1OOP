@@ -7,6 +7,8 @@ import exception.InvalidInput;
 import factory.MenuItemFactory;
 import model.MenuItem;
 import Service.MenuService;
+import dao.RestaurantDao;
+import model.Restaurant;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,23 +22,45 @@ public class RestServer {
 
     public static void start() throws IOException {
         MenuService menuService = new MenuService(new MenuItemDao());
+        RestaurantDao restaurantDao = new RestaurantDao();
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
-        server.createContext("/restaurants", ex -> handleRestaurants(ex, menuService));
+        server.createContext("/restaurants", ex -> handleRestaurants(ex, menuService, restaurantDao));
         server.createContext("/menu-items", ex -> handleMenuItems(ex, menuService));
-
+        server.createContext("/",ex ->{sendText(ex,200,"AAAAAAAAA");});
         server.setExecutor(null);
         server.start();
         System.out.println("REST server started: http://localhost:8080");
     }
 
-    // GET /restaurants/{id}/menu
-    // POST /restaurants/{id}/menu
-    private static void handleRestaurants(HttpExchange ex, MenuService menuService) throws IOException {
+    private static void handleRestaurants(HttpExchange ex, MenuService menuService, RestaurantDao restaurantDao) throws IOException {
         try {
             String[] parts = ex.getRequestURI().getPath().split("/");
-            // ["", "restaurants", "{id}", "menu"]
+            if(parts.length == 2 && "restaurants".equals(parts[1]) && "GET".equalsIgnoreCase(ex.getRequestMethod())){
+                List<Restaurant> list = restaurantDao.findAll();
+                sendJson(ex ,200, restaurantsToJson(list));
+            }
+            if (parts.length == 2 && "restaurants".equals(parts[1]) && "POST".equalsIgnoreCase(ex.getRequestMethod())) {
+                String body = readBody(ex.getRequestBody());
+                String name = JSON.simpleString(body, "name");
+
+
+                if (name == null || name.isBlank()) {
+                    sendText(ex, 400, "Name cannot be empty");
+                    return;
+                }
+
+                Integer existing = restaurantDao.findRestaurantIdByName(name);
+                if (existing != null) {
+                    sendText(ex, 409, "Restaurant already exists");
+                    return;
+                }
+
+                int id = restaurantDao.createRestaurant(name.trim());
+                sendJson(ex, 201, "{\"id\":" + id + "}");
+                return;
+            }
             if (parts.length == 4 && "restaurants".equals(parts[1]) && "menu".equals(parts[3])) {
                 int restaurantId = Integer.parseInt(parts[2]);
 
@@ -71,12 +95,9 @@ public class RestServer {
         }
     }
 
-    // PUT /menu-items/{id}/price
-    // DELETE /menu-items/{id}
     private static void handleMenuItems(HttpExchange ex, MenuService menuService) throws IOException {
         try {
             String[] parts = ex.getRequestURI().getPath().split("/");
-            // ["", "menu-items", "{id}", "price"]
             if (parts.length >= 3 && "menu-items".equals(parts[1])) {
                 int itemId = Integer.parseInt(parts[2]);
 
@@ -105,7 +126,6 @@ public class RestServer {
         }
     }
 
-    // --- helpers ---
     private static String readBody(InputStream is) throws IOException {
         return new String(is.readAllBytes(), StandardCharsets.UTF_8);
     }
@@ -143,5 +163,19 @@ public class RestServer {
 
     private static String escape(String s) {
         return s == null ? "" : s.replace("\"", "\\\"");
+    }
+
+    private static String restaurantsToJson(List<Restaurant> list){
+        StringBuilder sb = new StringBuilder("[");
+        for(int i = 0; i < list.size();i++){
+            Restaurant r = list.get(i);
+            sb.append("{")
+                    .append("\"id\":").append(r.getId()).append(",")
+                    .append("\"name\":\"").append(escape(r.getName())).append("\"")
+                    .append("}");
+            if (i < list.size() - 1) sb.append(",");
+        }
+        sb.append("]");
+        return  sb.toString();
     }
 }

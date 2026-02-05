@@ -10,8 +10,8 @@ import API.RestServer;
 import java.io.IOException;
 import Service.MenuService;
 import exception.InvalidInput;
-import java.io.IOException;
 import model.Restaurant;
+import repository.MenuItemRepository;
 
 public class Main {
     public static void main(String[] args) {
@@ -24,8 +24,8 @@ public class Main {
         Scanner sc = new Scanner(System.in);
 
         RestaurantDao restaurantDao = new RestaurantDao();
-        MenuItemDao menuItemDao = new MenuItemDao();
-        MenuService menuService = new MenuService(menuItemDao);
+        MenuItemRepository repo = new MenuItemDao();
+        MenuService menuService = new MenuService(repo);
 
         try {
             String restaurantName = "Shyngys Restaurant";
@@ -35,7 +35,7 @@ public class Main {
                 restaurantId = restaurantDao.createRestaurant(restaurantName);
                 System.out.println("Restaurant created in DB.");
             }
-            List<MenuItem> menuFromDb = menuItemDao.findMenuByRestaurant(restaurantId);
+            List<MenuItem> menuFromDb = repo.findMenuByRestaurant(restaurantId);
 
             Restaurant restaurant = new Restaurant(restaurantId, restaurantName, menuFromDb);
             Restaurant currentRestaurant = null;
@@ -94,7 +94,7 @@ public class Main {
                         }
 
                         Restaurant r = list.get(num - 1);
-                        List<MenuItem> menu = menuItemDao.findMenuByRestaurant(r.getId());
+                        List<MenuItem> menu = repo.findMenuByRestaurant(r.getId());
                         currentRestaurant = new Restaurant(r.getId(), r.getName(), menu);
 
                         System.out.println("Selected: " + currentRestaurant.getName());
@@ -162,8 +162,8 @@ public class Main {
                             System.out.println("Select a restaurant first (option 3).");
                             break;
                         }
-                        manageMenu(sc, currentRestaurant, menuItemDao, menuService);
-                        List<MenuItem> menu = menuItemDao.findMenuByRestaurant(currentRestaurant.getId());
+                        manageMenu(sc, currentRestaurant, repo, menuService);
+                        List<MenuItem> menu = repo.findMenuByRestaurant(currentRestaurant.getId());
                         currentRestaurant = new Restaurant(currentRestaurant.getId(), currentRestaurant.getName(), menu);
                         break;
                     }
@@ -178,11 +178,10 @@ public class Main {
             }
 
         } catch (SQLException e) {
-        System.out.println("DB ERROR: " + e.getMessage());
-        System.out.println("SQLSTATE: " + e.getSQLState());
+            System.out.println("Database connection failed.");
+            System.out.println("Reason: " + e.getMessage());
+        }
     }
-
-}
 
     private static void printRestaurants(List<Restaurant> list) {
         System.out.println("=== RESTAURANTS ===");
@@ -195,7 +194,7 @@ public class Main {
     }
     private static void manageMenu(Scanner sc,
                                    Restaurant restaurant,
-                                   MenuItemDao menuItemDao,
+                                   MenuItemRepository repo,
                                    MenuService menuService) throws SQLException {
 
         while (true) {
@@ -205,6 +204,7 @@ public class Main {
             System.out.println("3. Update item");
             System.out.println("4. Delete item");
             System.out.println("5. Make order");
+            System.out.println("6. Manage order");
             System.out.println("0. Back");
 
             System.out.print("Choose option: ");
@@ -214,7 +214,7 @@ public class Main {
 
                 case "1": {
                     restaurant.getMenu().clear();
-                    restaurant.getMenu().addAll(menuItemDao.findMenuByRestaurant(restaurant.getId()));
+                    restaurant.getMenu().addAll(repo.findMenuByRestaurant(restaurant.getId()));
                     restaurant.printMenu();
                     break;
                 }
@@ -251,7 +251,7 @@ public class Main {
 
                 case "3": {
                     restaurant.printMenu();
-                    System.out.print("Item number to update (1..n): ");
+                    System.out.print("Item number to update: ");
                     int num = Integer.parseInt(sc.nextLine());
 
                     MenuItem item = restaurant.getByNumber(num);
@@ -328,6 +328,12 @@ public class Main {
                         Order order = new Order(1, cart.toArray(new MenuItem[0]));
                         order.printOrder();
                     }
+                    break;
+                }
+                case "6":{
+                    restaurant.sortByPrice();
+                    restaurant.printMenu();
+                    System.out.println("Menu sorted by price.");
                     break;
                 }
 

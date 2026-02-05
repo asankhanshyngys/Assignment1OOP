@@ -42,11 +42,6 @@ public class Restaurant {
                 item.printInfo();
         }
     }
-    public void sortByPrice(){
-        menu.sort(Comparator.comparingDouble(MenuItem::getPrice));
-        System.out.println("\nMenu sorted by price (cheapest first:)");
-        printMenu();
-    }
 
     public MenuItem searchByName(String name){
         for(MenuItem item : menu){
@@ -69,6 +64,10 @@ public class Restaurant {
             return menu.get(idx);
         }
         return null;
+    }
+
+    public void sortByPrice(){
+        menu.sort((a, b) -> Double.compare(a.getPrice(), b.getPrice()));
     }
 
     public List<MenuItem> getMenu(){
