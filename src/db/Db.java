@@ -4,10 +4,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Db {
-    private static final String URL = "jdbc:postgresql://localhost:5432/restaurant-db";
-    private static final String USER = "Shyngys";
-    private static final String PASS = "Shyngys7681@_";
-
+    private static final String URL = System.getenv().getOrDefault("DB_URL",
+            "jdbc:postgresql://localhost:5432/restaurant-db");
+    private static final String USER = System.getenv().getOrDefault("DB_USER","postgres");
+    private static final String PASS = System.getenv().getOrDefault("DB_PASS", "");
     public static Connection getConnection()
             throws SQLException{
         return  DriverManager.getConnection(URL, USER, PASS);

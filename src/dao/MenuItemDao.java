@@ -2,12 +2,13 @@ package dao;
 
 import db.Db;
 import model.MenuItem;
+import repository.MenuItemRepository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MenuItemDao {
+public class MenuItemDao implements MenuItemRepository {
 
     public int createMenuItem(MenuItem item) throws SQLException {
         String sql = "INSERT INTO menu_items(restaurant_id, name, price, category) VALUES (?,?,?,?) RETURNING id";
@@ -55,6 +56,20 @@ public class MenuItemDao {
         }
     }
 
+    public void updateItem(int id, String name, double price, String category) throws SQLException {
+        String sql = "UPDATE menu_items SET name=?, price=?, category=? WHERE id=?";
+        try (Connection con = Db.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setDouble(2, price);
+            ps.setString(3, category);
+            ps.setInt(4, id);
+
+            ps.executeUpdate();
+        }
+    }
+3
     public void deleteItem(int itemId) throws SQLException {
         String sql = "DELETE FROM menu_items WHERE id=?";
         try (Connection con = Db.getConnection();
@@ -64,4 +79,3 @@ public class MenuItemDao {
         }
     }
 }
-
