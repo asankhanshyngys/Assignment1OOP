@@ -29,8 +29,10 @@ public class Restaurant {
 
     public void printMenu() {
         System.out.println("=== MENU of " + name + " ===");
-        for (MenuItem item : menu) {
-            item.printInfo();
+        int number = 1;
+        for (MenuItem item : menu){
+            System.out.println(number + "." + item);
+            number++;
         }
     }
     public void filterByCategory(String category){
@@ -61,6 +63,14 @@ public class Restaurant {
         }
         return null;
     }
+    public MenuItem getByNumber(int number){
+        int idx = number - 1;
+        if(idx >= 0 && idx < menu.size()){
+            return menu.get(idx);
+        }
+        return null;
+    }
+
     public List<MenuItem> getMenu(){
         return menu;
     }
