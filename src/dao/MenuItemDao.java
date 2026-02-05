@@ -69,7 +69,7 @@ public class MenuItemDao implements MenuItemRepository {
             ps.executeUpdate();
         }
     }
-3
+
     public void deleteItem(int itemId) throws SQLException {
         String sql = "DELETE FROM menu_items WHERE id=?";
         try (Connection con = Db.getConnection();
